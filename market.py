@@ -11,6 +11,16 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(page, campaign_id, access_token):
+    """Get a list of Yandex Market products.
+
+    Args:
+        page(str): results page ID
+        campaign_id(str): campaign ID to use Yandex Market API
+        access_token(str): token to use Yandex Market API
+
+    Returns:
+        dict: dictionary with products information in json format
+    """
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -30,6 +40,15 @@ def get_product_list(page, campaign_id, access_token):
 
 
 def update_stocks(stocks, campaign_id, access_token):
+    """Update stocks in Yandex Market.
+
+    Args:
+        stocks(list): list with warehouse ID, SKU and products info
+        campaign_id(str): campaign ID to use Yandex Market API
+        access_token(str): token to use Yandex Market API
+
+    Returns:
+        dict: dictionary with operation status in json format"""
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -46,6 +65,15 @@ def update_stocks(stocks, campaign_id, access_token):
 
 
 def update_price(prices, campaign_id, access_token):
+    """Update prices in Yandex Market.
+
+    Args:
+        prices(list): price list
+        campaign_id(str): campaign ID to use Yandex Market API
+        access_token(str): token to use Yandex Market API
+
+    Returns:
+        dict: dictionary with products and prices in json format"""
     endpoint_url = "https://api.partner.market.yandex.ru/"
     headers = {
         "Content-Type": "application/json",
@@ -62,7 +90,14 @@ def update_price(prices, campaign_id, access_token):
 
 
 def get_offer_ids(campaign_id, market_token):
-    """Получить артикулы товаров Яндекс маркета"""
+    """Get Yandex Market offer ids.
+
+    Args:
+        campaign_id(str): campaign ID to use Yandex Market API
+        market_token(str): token to use Yandex Market API
+
+    Returns:
+        list: list with offer ids"""
     page = ""
     product_list = []
     while True:
@@ -78,6 +113,16 @@ def get_offer_ids(campaign_id, market_token):
 
 
 def create_stocks(watch_remnants, offer_ids, warehouse_id):
+    """Create stocks list.
+
+    Args:
+        watch_remnants(list): watch list
+        offer_ids(list): list with offer ids
+        warehouse_id(str): ID of your warehouse
+
+    Returns:
+        list: list with warehouse ID, SKU and products info
+    """
     # Уберем то, что не загружено в market
     stocks = list()
     date = str(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
@@ -123,6 +168,15 @@ def create_stocks(watch_remnants, offer_ids, warehouse_id):
 
 
 def create_prices(watch_remnants, offer_ids):
+    """Create price list.
+
+    Args:
+        watch_remnants(list): watch list
+        offer_ids(list): list with offer ids
+
+    Returns:
+        list: price list
+    """
     prices = []
     for watch in watch_remnants:
         if str(watch.get("Код")) in offer_ids:
@@ -143,6 +197,15 @@ def create_prices(watch_remnants, offer_ids):
 
 
 async def upload_prices(watch_remnants, campaign_id, market_token):
+    """Upload prices in Yandex Market.
+
+    Args:
+        watch_remnants(list): watch list
+        campaign_id(str): campaign ID to use Yandex Market API
+        market_token(str): token to use Yandex Market API
+
+    Returns:
+        list: price list"""
     offer_ids = get_offer_ids(campaign_id, market_token)
     prices = create_prices(watch_remnants, offer_ids)
     for some_prices in list(divide(prices, 500)):
@@ -151,6 +214,17 @@ async def upload_prices(watch_remnants, campaign_id, market_token):
 
 
 async def upload_stocks(watch_remnants, campaign_id, market_token, warehouse_id):
+    """Upload stocks in Yandex Market.
+
+    Args:
+        watch_remnants(list): watch list
+        campaign_id(str): campaign ID to use Yandex Market API
+        market_token(str): token to use Yandex Market API
+        warehouse_id(str): ID of your warehouse
+
+    Returns:
+        list: list non-zero stocks
+        list: stocks list"""
     offer_ids = get_offer_ids(campaign_id, market_token)
     stocks = create_stocks(watch_remnants, offer_ids, warehouse_id)
     for some_stock in list(divide(stocks, 2000)):

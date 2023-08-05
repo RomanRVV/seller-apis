@@ -144,7 +144,7 @@ def create_stocks(watch_remnants, offer_ids):
         offer_ids(list): list with offer ids
 
     Returns:
-        list: price list
+        list: list with offer ids and stocks
     """
     # Уберем то, что не загружено в seller
     stocks = []
@@ -173,7 +173,7 @@ def create_prices(watch_remnants, offer_ids):
         offer_ids(list): list with offer ids
 
     Returns:
-        list: list with offer ids and stocks
+        list: price list
     """
     prices = []
     for watch in watch_remnants:
@@ -216,8 +216,7 @@ def divide(lst: list, n: int):
         n(int): step size for one iteration
 
     Yield:
-        list: generated list
-    """
+        list: generated list"""
     for i in range(0, len(lst), n):
         yield lst[i : i + n]
 
@@ -231,7 +230,7 @@ async def upload_prices(watch_remnants, client_id, seller_token):
         seller_token(str): token to use Ozon API
 
     Returns:
-        list: number converted from price"""
+        list: price list"""
     offer_ids = get_offer_ids(client_id, seller_token)
     prices = create_prices(watch_remnants, offer_ids)
     for some_price in list(divide(prices, 1000)):
